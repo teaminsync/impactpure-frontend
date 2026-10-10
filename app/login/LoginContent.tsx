@@ -34,6 +34,7 @@ const LoginContent = () => {
   const [isOtpLoading, setIsOtpLoading] = useState(false)
   const [isVerifyLoading, setIsVerifyLoading] = useState(false)
   const [isResetLoading, setIsResetLoading] = useState(false)
+  const [verificationToken, setVerificationToken] = useState("")
 
   const startResendTimer = () => {
     setResendDisabled(true)
@@ -88,6 +89,7 @@ const LoginContent = () => {
         toast.success("Phone number verified successfully!")
         setIsOtpVerified(true)
         setOtpSent(false)
+        setVerificationToken(response.data.verificationToken || "")
       } else {
         toast.error(response.data.message || "Invalid OTP")
         setIsOtpVerified(false)
@@ -113,6 +115,7 @@ const LoginContent = () => {
       const response = await axios.post(`${backendUrl}/api/user/reset-password`, {
         phoneNumber: formattedPhoneNumber,
         newPassword,
+        verificationToken,
       })
       if (response.data.success) {
         toast.success("Password reset successfully!")
@@ -151,6 +154,7 @@ const LoginContent = () => {
           email,
           password,
           phoneNumber: formatPhoneNumber(phoneNumber),
+          verificationToken,
         })
 
         if (response.data.success) {
