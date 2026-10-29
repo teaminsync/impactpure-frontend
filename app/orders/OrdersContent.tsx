@@ -40,7 +40,7 @@ const OrdersContent = () => {
         response.data.orders.forEach((order: Order) => {
           if (Array.isArray(order.items)) {
             order.items.forEach((item: OrderItem) => {
-              if (!item.product) {
+              if (!item.product && !(item as any).name) {
                 console.warn("Missing product details in order item:", item)
                 return
               }
@@ -49,8 +49,8 @@ const OrdersContent = () => {
                 _id: item.product?._id || "Unknown ID",
                 product: item.product,
                 quantity: item.quantity || 1,
-                name: item.product?.name || "Unknown Item",
-                price: item.product?.price || "N/A",
+                name: item.product?.name || (item as any).name || "Unknown Item",
+                price: item.product?.price || (item as any).price || "N/A",
                 image: Array.isArray(item.product?.image) ? item.product.image : [],
                 status: order.status || "Unknown",
                 payment: order.payment || false,

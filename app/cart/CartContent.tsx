@@ -155,7 +155,7 @@ const CartContent = () => {
                             <motion.button
                               whileHover={{ scale: 1.1 }}
                               whileTap={{ scale: 0.9 }}
-                              onClick={() => updateQuantity(item._id, item.quantity + 1)}
+                              onClick={() => updateQuantity(item._id, Math.min(10, item.quantity + 1))}
                               className="w-8 h-8 flex items-center justify-center hover:bg-neutral-50 transition-colors"
                             >
                               <Plus size={14} />
@@ -209,7 +209,7 @@ const CartContent = () => {
                             <motion.button
                               whileHover={{ scale: 1.1 }}
                               whileTap={{ scale: 0.9 }}
-                              onClick={() => updateQuantity(item._id, item.quantity + 1)}
+                              onClick={() => updateQuantity(item._id, Math.min(10, item.quantity + 1))}
                               className="w-8 h-8 flex items-center justify-center hover:bg-neutral-50 transition-colors"
                             >
                               <Plus size={14} />

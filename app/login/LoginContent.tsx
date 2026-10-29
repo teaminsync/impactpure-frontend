@@ -26,7 +26,7 @@ const LoginContent = () => {
   const [otpSent, setOtpSent] = useState(false)
   const [isOtpVerified, setIsOtpVerified] = useState(false)
   const [resendDisabled, setResendDisabled] = useState(false)
-  const [timer, setTimer] = useState(30)
+  const [timer, setTimer] = useState(60)
   const [showPassword, setShowPassword] = useState(false)
   const [newPassword, setNewPassword] = useState("")
   const [forgotPassword, setForgotPassword] = useState(false)
@@ -38,7 +38,7 @@ const LoginContent = () => {
 
   const startResendTimer = () => {
     setResendDisabled(true)
-    setTimer(30)
+    setTimer(60)
     const countdown = setInterval(() => {
       setTimer((prev) => {
         if (prev <= 1) {
@@ -275,7 +275,7 @@ const LoginContent = () => {
                           type={showPassword ? "text" : "password"}
                           value={newPassword}
                           onChange={(e) => setNewPassword(e.target.value)}
-                          placeholder="New Password"
+                          placeholder="New Password (at least 10 characters)"
                         />
                         <button
                           type="button"
@@ -419,7 +419,7 @@ const LoginContent = () => {
                             type={showPassword ? "text" : "password"}
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
-                            placeholder="Create Password"
+                            placeholder="Create Password (at least 10 characters)"
                             required
                           />
                           <button

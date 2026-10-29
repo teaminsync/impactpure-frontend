@@ -13,6 +13,7 @@ import { Button } from "@/components/ui/Button"
 import { Input } from "@/components/ui/Input"
 import FadeIn from "@/components/animations/FadeIn"
 import type { Address } from "@/types"
+import { serverMessage, verifyOutcome } from "@/lib/apiMessage"
 
 const PlaceOrderContent = () => {
   const [method, setMethod] = useState("cod")
@@ -28,7 +29,7 @@ const PlaceOrderContent = () => {
     city: "",
     state: "",
     pincode: "",
-    country: "",
+    country: "India",
     phone: "",
     alt_phone: "",
   })
@@ -54,26 +55,26 @@ const PlaceOrderContent = () => {
               razorpay_order_id: response.razorpay_order_id,
               razorpay_payment_id: response.razorpay_payment_id,
               razorpay_signature: response.razorpay_signature,
-              items: Object.keys(cartItems).map((productId) => ({
-                _id: productId,
-                quantity: cartItems[productId],
-              })),
-              amount: getCartAmount() + delivery_fee,
-              address: formData,
             },
             { headers: { token } },
           )
 
-          if (verifyResponse.data.success) {
+          const outcome = verifyOutcome(verifyResponse)
+          if (outcome === "pending") {
+            toast.info("Your payment is being confirmed. Please check My Orders in a few minutes. Do not pay again.", {
+              autoClose: 10000,
+            })
+            navigate("/orders")
+          } else if (outcome === "success") {
             toast.success("Payment Successful! Order Placed.")
             setCartItems({})
             navigate("/orders")
           } else {
-            toast.error("Payment verification failed. Try again.")
+            toast.error("Payment could not be verified. If money was deducted, please contact support before paying again.")
           }
         } catch (error) {
           console.log(error)
-          toast.error("Error verifying payment.")
+          toast.error(serverMessage(error, "Error verifying payment. If money was deducted it will be reconciled; please contact support."))
         } finally {
           setIsProcessing(false)
         }
@@ -97,10 +98,19 @@ const PlaceOrderContent = () => {
 
     setIsProcessing(true)
     try {
-      const orderItems = Object.keys(cartItems).map((itemId) => ({
-        _id: itemId,
-        quantity: cartItems[itemId],
-      }))
+      // Only lines that are really in the cart: no zero quantities, no products that no longer exist
+      const orderItems = Object.keys(cartItems)
+        .filter((itemId) => cartItems[itemId] > 0 && products.some((p) => p._id === itemId))
+        .map((itemId) => ({
+          _id: itemId,
+          quantity: cartItems[itemId],
+        }))
+
+      if (orderItems.length === 0) {
+        toast.error("Your cart is empty.")
+        setIsProcessing(false)
+        return
+      }
 
       const orderData = {
         address: formData,
@@ -138,7 +148,7 @@ const PlaceOrderContent = () => {
       }
     } catch (error) {
       console.error(error)
-      toast.error("Something went wrong. Please try again.")
+      toast.error(serverMessage(error, "Something went wrong. Please try again."))
       setIsProcessing(false)
     }
   }
